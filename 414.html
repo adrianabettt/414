@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missão Loop: Repetição Simples</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --success: #27ae60;
+            --error: #e74c3c;
+            --dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 550px;
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+        
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            transition: 0.3s;
+        }
+
+        .btn:hover { opacity: 0.9; }
+
+        .code-box {
+            background: #1e1e1e;
+            color: #dcdcdc;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 20px 0;
+            font-size: 1.1rem;
+        }
+
+        input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border-radius: 4px;
+            border: 2px solid var(--primary);
+            text-align: center;
+            font-size: 1rem;
+            background: #fff;
+            color: #333;
+        }
+
+        .feedback { margin-top: 15px; font-weight: bold; min-height: 24px; }
+        .correct { color: var(--success); }
+        .wrong { color: var(--error); }
+        
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            font-size: 13px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <!-- TELA INICIAL -->
+    <div id="intro">
+        <h1>🤖 Missão Repetição</h1>
+        <p>Ajude o robô a realizar tarefas repetitivas usando o comando <strong>REPITA</strong>!</p>
+        <button class="btn" onclick="startChallenge()">Iniciar Desafio</button>
+    </div>
+
+    <!-- FASES DE REPETIÇÃO SIMPLES -->
+    <div id="phase-container" class="hidden">
+        <h2 id="phase-title">Fase</h2>
+        <p id="phase-desc"></p>
+        
+        <div class="code-box">
+            <span style="color: #569cd6;">REPITA</span> 
+            <input type="number" id="loop-value" min="0" placeholder="?"> 
+            <span style="color: #569cd6;">VEZES:</span><br>
+            <div style="margin-left: 30px; color: #ce9178; margin-top: 10px;">
+                ➔ <span id="command-label">Comando</span>
+            </div>
+        </div>
+        
+        <button class="btn" onclick="checkAnswer()">Executar Algoritmo</button>
+        <div id="feedback" class="feedback"></div>
+    </div>
+
+    <!-- TELA FINAL -->
+    <div id="result" class="hidden">
+        <h2>🎉 Parabéns!</h2>
+        <p>Você aprendeu como a repetição simplifica o trabalho do robô.</p>
+        <div id="final-score" style="font-size: 40px; color: var(--success); font-weight: bold;"></div>
+        <button class="btn" onclick="location.reload()">Jogar Novamente</button>
+    </div>
+</div>
+
+<footer>
+    Material Pedagógico – Profª Adriana Bett Terebinto © 2026
+</footer>
+
+<script>
+    let currentStep = 0;
+    let score = 0;
+
+    const challenges = [
+        { 
+            title: "Caminhada do Robô", 
+            desc: "O robô precisa dar 7 passos para chegar ao carregador. Quantas vezes ele deve repetir o passo?", 
+            command: "Dar um passo", 
+            correct: 7 
+        },
+        { 
+            title: "Limpando a Sala", 
+            desc: "Existem 4 papéis no chão. O robô deve usar o comando 'Recolher' para cada um deles.", 
+            command: "Recolher papel", 
+            correct: 4 
+        },
+        { 
+            title: "Sinal de Alerta", 
+            desc: "Para avisar que terminou, o robô deve piscar sua luz 10 vezes.", 
+            command: "Piscar luz", 
+            correct: 10 
+        }
+    ];
+
+    function startChallenge() {
+        document.getElementById('intro').classList.add('hidden');
+        document.getElementById('phase-container').classList.remove('hidden');
+        updateUI();
+    }
+
+    function updateUI() {
+        const item = challenges[currentStep];
+        document.getElementById('phase-title').innerText = item.title;
+        document.getElementById('phase-desc').innerText = item.desc;
+        document.getElementById('command-label').innerText = item.command;
+        document.getElementById('loop-value').value = "";
+        document.getElementById('feedback').innerText = "";
+    }
+
+    function checkAnswer() {
+        const userVal = parseInt(document.getElementById('loop-value').value);
+        const fb = document.getElementById('feedback');
+
+        if (userVal === challenges[currentStep].correct) {
+            score += 3.3;
+            fb.innerHTML = "<span class='correct'>✔ Correto! O robô completou a tarefa.</span>";
+            setTimeout(() => {
+                currentStep++;
+                if (currentStep < challenges.length) {
+                    updateUI();
+                } else {
+                    showFinal();
+                }
+            }, 1500);
+        } else {
+            fb.innerHTML = "<span class='wrong'>❌ Quase! Pense em quantas vezes a ação deve acontecer.</span>";
+        }
+    }
+
+    function showFinal() {
+        document.getElementById('phase-container').classList.add('hidden');
+        document.getElementById('result').classList.remove('hidden');
+        document.getElementById('final-score').innerText = "Nota: " + Math.ceil(score);
+    }
+</script>
+
+</body>
+</html>
